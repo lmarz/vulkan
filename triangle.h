@@ -7,6 +7,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <cglm/cglm.h>
+
 #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
 #define ASSERT(val, pos) if(val != VK_SUCCESS) { printf("Error: %d | %s\n", val, pos); exit(-1); }
 
@@ -28,6 +30,12 @@ typedef struct Buffer {
     size_t size;
     void* data;
 } Buffer;
+
+typedef struct Uniform {
+    mat4 projection;
+    mat4 view;
+    mat4 model;
+} Uniform;
 
 typedef struct Context {
     int width;

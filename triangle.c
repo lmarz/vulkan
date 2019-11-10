@@ -33,20 +33,22 @@ void init(Context* context) {
 
     context->vertexShader = loadShader(context, "res/shaders/vert.spv");
     context->fragmentShader = loadShader(context, "res/shaders/frag.spv");
-    context->setLayout = createSetLayout(context, NULL);
+
+    context->setLayout = createSetLayout(context);
     context->layout = createPipelineLayout(context);
     context->pipeline = createGraphicsPipeline(context);
 
     context->commandPool = createCommandPool(context);
     context->commandBuffer = createCommandBuffer(context);
-    VkDescriptorPoolSize size = { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1 };
+    VkDescriptorPoolSize size = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 };
     context->descriptorPool = createDescriptorPool(context, &size);
-    // context->descriptorSet = createDescriptorSet(context);
+    context->descriptorSet = createDescriptorSet(context);
 
-    context->buffers = malloc(sizeof(Buffer) * 3);
+    context->buffers = malloc(sizeof(Buffer) * 4); // scratch vertexbuffer indexbuffer uniformbuffer
     context->buffers[0] = createBuffer(context, 128 * 1024, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     context->buffers[1] = createBuffer(context, 128 * 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     context->buffers[2] = createBuffer(context, 128 * 1024, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    context->buffers[3] = createBuffer(context, 65536, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     Vertex vertices[] = {
         {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
@@ -56,8 +58,33 @@ void init(Context* context) {
 
     uint16_t indices[] = {0, 1, 2};
 
+    Uniform uniform;
+    glm_perspective_default((float)context->width / (float)context->height, uniform.projection);
+    vec3 eye = {0, 0, 2};
+    vec3 center = {0, 0, 0};
+    vec3 up = {0, 1, 0};
+    glm_lookat(eye, center, up, uniform.view);
+    glm_mat4_identity(uniform.model);
+    vec3 axis = {0, 1, 0};
+    glm_rotate(uniform.model, 0.5f, axis);
+
     uploadBuffer(context, context->buffers[0], context->buffers[1], vertices, sizeof(vertices));
     uploadBuffer(context, context->buffers[0], context->buffers[2], indices, sizeof(indices));
+    uploadBuffer(context, context->buffers[0], context->buffers[3], &uniform, sizeof(uniform));
+
+    VkDescriptorBufferInfo bufferInfo = {};
+    bufferInfo.buffer = context->buffers[3].buffer;
+    bufferInfo.offset = 0;
+    bufferInfo.range = context->buffers[3].size;
+
+    VkWriteDescriptorSet write = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+    write.dstSet = context->descriptorSet;
+    write.dstBinding = 0;
+    write.descriptorCount = 1;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    write.pBufferInfo = &bufferInfo;
+
+    vkUpdateDescriptorSets(context->device, 1, &write, 0, NULL);
 
     context->acquireSemaphore = createSemaphore(context);
     context->releaseSemaphore = createSemaphore(context);
@@ -133,7 +160,7 @@ void mainLoop(Context* context) {
 
         vkCmdSetScissor(context->commandBuffer, 0, 1, &scissor);
 
-        // vkCmdBindDescriptorSets(context->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->layout, 0, 1, &context->descriptorSet, 0, NULL);
+        vkCmdBindDescriptorSets(context->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->layout, 0, 1, &context->descriptorSet, 0, NULL);
         vkCmdBindPipeline(context->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->pipeline);
         VkDeviceSize offsets[1] = {0};
         vkCmdBindVertexBuffers(context->commandBuffer, 0, 1, &context->buffers[1].buffer, offsets);
@@ -175,6 +202,7 @@ void clean(Context* context) {
     vkDestroySemaphore(context->device, context->releaseSemaphore, NULL);
     vkDestroySemaphore(context->device, context->acquireSemaphore, NULL);
 
+    destroyBuffer(context, context->buffers[3]);
     destroyBuffer(context, context->buffers[2]);
     destroyBuffer(context, context->buffers[1]);
     destroyBuffer(context, context->buffers[0]);

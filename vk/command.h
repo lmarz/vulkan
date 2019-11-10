@@ -39,7 +39,7 @@ VkDescriptorSet createDescriptorSet(Context* context) {
     allocInfo.pSetLayouts = &context->setLayout;
 
     VkDescriptorSet descriptorSet;
-    ASSERT(vkAllocateDescriptorSets(context->device, NULL, &descriptorSet), "descriptorSet");
+    ASSERT(vkAllocateDescriptorSets(context->device, &allocInfo, &descriptorSet), "descriptorSet");
     return descriptorSet;
 }
 

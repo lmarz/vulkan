@@ -1,5 +1,5 @@
 INCLUDE=-DDEBUG -I. -I./external/cglm/include
-LIBS=-lglfw -lvulkan
+LIBS=-lglfw -lvulkan -lm
 
 all: triangle res/shaders/vert.spv res/shaders/frag.spv
 	@echo "Starting triangle ..."
