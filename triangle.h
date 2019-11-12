@@ -43,8 +43,10 @@ typedef struct Uniform {
 typedef struct Model {
     size_t verticesCount;
     Vertex* vertices;
+    size_t verticesSize;
     size_t indicesCount;
     uint16_t* indices;
+    size_t indicesSize;
 } Model;
 
 typedef struct Context {
