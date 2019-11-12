@@ -7,6 +7,8 @@
 #include "vk/command.h"
 #include "vk/buffer.h"
 
+#include "modelloader.h"
+
 void init(Context* context) {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -34,7 +36,13 @@ void init(Context* context) {
     context->vertexShader = loadShader(context, "res/shaders/vert.spv");
     context->fragmentShader = loadShader(context, "res/shaders/frag.spv");
 
-    context->setLayout = createSetLayout(context);
+    VkDescriptorSetLayoutBinding bindings[1] = {};
+    bindings[0].binding = 0;
+    bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    bindings[0].descriptorCount = 1;
+    bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    context->setLayout = createSetLayout(context, ARRAYSIZE(bindings), bindings);
     context->layout = createPipelineLayout(context);
     context->pipeline = createGraphicsPipeline(context);
 
@@ -50,27 +58,27 @@ void init(Context* context) {
     context->buffers[2] = createBuffer(context, 128 * 1024, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     context->buffers[3] = createBuffer(context, 65536, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
+    context->model = loadModel("res/models/cube.gltf");
+
     Vertex vertices[] = {
-        {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-        {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-        {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+        {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+        {{-1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+        {{1.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+        {{-1.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
     };
 
-    uint16_t indices[] = {0, 1, 2};
+    uint16_t indices[] = {0, 1, 2, 2, 1, 3, 2, 1, 0, 3, 1, 2};
 
-    Uniform uniform;
-    glm_perspective_default((float)context->width / (float)context->height, uniform.projection);
-    vec3 eye = {0, 0, 2};
+    glm_perspective_default((float)context->width / (float)context->height, context->uniform.projection);
+    vec3 eye = {0, 0, 4};
     vec3 center = {0, 0, 0};
     vec3 up = {0, 1, 0};
-    glm_lookat(eye, center, up, uniform.view);
-    glm_mat4_identity(uniform.model);
-    vec3 axis = {0, 1, 0};
-    glm_rotate(uniform.model, 0.5f, axis);
+    glm_lookat(eye, center, up, context->uniform.view);
+    glm_mat4_identity(context->uniform.model);
 
     uploadBuffer(context, context->buffers[0], context->buffers[1], vertices, sizeof(vertices));
     uploadBuffer(context, context->buffers[0], context->buffers[2], indices, sizeof(indices));
-    uploadBuffer(context, context->buffers[0], context->buffers[3], &uniform, sizeof(uniform));
+    uploadBuffer(context, context->buffers[0], context->buffers[3], &context->uniform, sizeof(Uniform));
 
     VkDescriptorBufferInfo bufferInfo = {};
     bufferInfo.buffer = context->buffers[3].buffer;
@@ -114,6 +122,24 @@ void mainLoop(Context* context) {
             // Weird hack
             // continue;
         }
+
+        vec3 axis = {0, 1, 0};
+        glm_rotate(context->uniform.model, 0.05f, axis);
+        uploadBuffer(context, context->buffers[0], context->buffers[3], &context->uniform, sizeof(Uniform));
+    
+        VkDescriptorBufferInfo bufferInfo = {};
+        bufferInfo.buffer = context->buffers[3].buffer;
+        bufferInfo.offset = 0;
+        bufferInfo.range = context->buffers[3].size;
+
+        VkWriteDescriptorSet write = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+        write.dstSet = context->descriptorSet;
+        write.dstBinding = 0;
+        write.descriptorCount = 1;
+        write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        write.pBufferInfo = &bufferInfo;
+
+        vkUpdateDescriptorSets(context->device, 1, &write, 0, NULL);
 
         uint32_t imageIndex;
         vkAcquireNextImageKHR(context->device, context->swapchain, 0, context->acquireSemaphore, VK_NULL_HANDLE, &imageIndex);
@@ -166,7 +192,7 @@ void mainLoop(Context* context) {
         vkCmdBindVertexBuffers(context->commandBuffer, 0, 1, &context->buffers[1].buffer, offsets);
         vkCmdBindIndexBuffer(context->commandBuffer, context->buffers[2].buffer, 0, VK_INDEX_TYPE_UINT16);
 
-        vkCmdDrawIndexed(context->commandBuffer, 3, 1, 0, 0, 1);
+        vkCmdDrawIndexed(context->commandBuffer, 12, 1, 0, 0, 1);
 
         vkCmdEndRenderPass(context->commandBuffer);
 
@@ -201,6 +227,8 @@ void mainLoop(Context* context) {
 void clean(Context* context) {
     vkDestroySemaphore(context->device, context->releaseSemaphore, NULL);
     vkDestroySemaphore(context->device, context->acquireSemaphore, NULL);
+
+    destroyModel(context->model);
 
     destroyBuffer(context, context->buffers[3]);
     destroyBuffer(context, context->buffers[2]);

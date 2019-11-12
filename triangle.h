@@ -9,6 +9,9 @@
 
 #include <cglm/cglm.h>
 
+#define CGLTF_IMPLEMENTATION
+#include <cgltf.h>
+
 #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
 #define ASSERT(val, pos) if(val != VK_SUCCESS) { printf("Error: %d | %s\n", val, pos); exit(-1); }
 
@@ -36,6 +39,13 @@ typedef struct Uniform {
     mat4 view;
     mat4 model;
 } Uniform;
+
+typedef struct Model {
+    size_t verticesCount;
+    Vertex* vertices;
+    size_t indicesCount;
+    uint16_t* indices;
+} Model;
 
 typedef struct Context {
     int width;
@@ -77,6 +87,9 @@ typedef struct Context {
 
     VkSemaphore acquireSemaphore;
     VkSemaphore releaseSemaphore;
+
+    Uniform uniform;
+    Model model;
 } Context;
 
 uint32_t selectMemoryType(VkPhysicalDeviceMemoryProperties properties, uint32_t memoryTypeBits, VkMemoryPropertyFlags flags) {

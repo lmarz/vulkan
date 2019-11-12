@@ -24,15 +24,10 @@ VkShaderModule loadShader(Context* context, const char* path) {
     return shader;
 }
 
-VkDescriptorSetLayout createSetLayout(Context* context) {
-    VkDescriptorSetLayoutBinding bindings[1] = {};
-    bindings[0].binding = 0;
-    bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    bindings[0].descriptorCount = 1;
-    bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+VkDescriptorSetLayout createSetLayout(Context* context, uint32_t bindingCount, VkDescriptorSetLayoutBinding* bindings) {
 
     VkDescriptorSetLayoutCreateInfo createInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
-    createInfo.bindingCount = ARRAYSIZE(bindings);
+    createInfo.bindingCount = bindingCount;
     createInfo.pBindings = bindings;
 
     VkDescriptorSetLayout setLayout;

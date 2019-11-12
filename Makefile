@@ -1,4 +1,4 @@
-INCLUDE=-DDEBUG -I. -I./external/cglm/include
+INCLUDE=-DDEBUG -I. -I./external/cglm/include -I./external/cgltf
 LIBS=-lglfw -lvulkan -lm
 
 all: triangle res/shaders/vert.spv res/shaders/frag.spv
