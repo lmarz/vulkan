@@ -8,6 +8,7 @@ all: triangle res/shaders/vert.spv res/shaders/frag.spv
 triangle: triangle.o
 	@echo "||| triangle.o --->>> triangle |||"
 	@gcc -o triangle triangle.o $(LIBS)
+	@rm triangle.o
 
 triangle.o: triangle.c
 	@echo "||| triangle.c --->>> triangle.o |||"
@@ -23,4 +24,4 @@ res/shaders/frag.spv: res/shaders/shader.frag
 
 clean:
 	@echo "Cleaning up ..."
-	@rm triangle triangle.o res/shaders/vert.spv res/shaders/frag.spv
+	@rm triangle res/shaders/vert.spv res/shaders/frag.spv
