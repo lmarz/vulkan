@@ -1,4 +1,4 @@
-triangle
-triangle.o
+vulkan
 res/shaders/vert.spv
 res/shaders/frag.spv
+vulkan.o

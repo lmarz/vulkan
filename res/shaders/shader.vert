@@ -10,6 +10,9 @@ layout(binding=0) uniform UBO {
     mat4 model;  
 };
 
+layout(location=0) out vec2 UV;
+
 void main() {
+    UV = uv;
     gl_Position = projection * view * model * vec4(pos, 1.0f);
 }

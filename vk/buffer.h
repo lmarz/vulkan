@@ -1,4 +1,5 @@
-#include "triangle.h"
+#pragma once
+#include "vulkan.h"
 
 Buffer createBuffer(Context* context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags flags) {
     VkBufferCreateInfo createInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };

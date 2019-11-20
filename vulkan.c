@@ -1,4 +1,4 @@
-#include "triangle.h"
+#include "vulkan.h"
 
 #include "vk/instance.h"
 #include "vk/device.h"
@@ -6,13 +6,14 @@
 #include "vk/pipeline.h"
 #include "vk/command.h"
 #include "vk/buffer.h"
+#include "vk/texture.h"
 
 #include "modelloader.h"
 
 void init(Context* context) {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    context->window = glfwCreateWindow(context->width, context->height, "Triangle", NULL, NULL);
+    context->window = glfwCreateWindow(context->width, context->height, "Suzanne", NULL, NULL);
 
     context->instance = createInstance();
     context->surface = createSurface(context);
@@ -36,11 +37,15 @@ void init(Context* context) {
     context->vertexShader = loadShader(context, "res/shaders/vert.spv");
     context->fragmentShader = loadShader(context, "res/shaders/frag.spv");
 
-    VkDescriptorSetLayoutBinding bindings[1] = {};
+    VkDescriptorSetLayoutBinding bindings[2] = {};
     bindings[0].binding = 0;
     bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     bindings[0].descriptorCount = 1;
     bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    bindings[1].binding = 1;
+    bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    bindings[1].descriptorCount = 1;
+    bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
     context->setLayout = createSetLayout(context, ARRAYSIZE(bindings), bindings);
     context->layout = createPipelineLayout(context);
@@ -60,17 +65,8 @@ void init(Context* context) {
 
     context->model = loadModel("res/models/cube.gltf");
 
-    Vertex vertices[] = {
-        {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-        {{-1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-        {{1.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-        {{-1.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-    };
-
-    uint16_t indices[] = {0, 1, 2, 2, 1, 3, 2, 1, 0, 3, 1, 2};
-
     glm_perspective_default((float)context->width / (float)context->height, context->uniform.projection);
-    vec3 eye = {0, -2, 5};
+    vec3 eye = {0, -2, -5};
     vec3 center = {0, 0, 0};
     vec3 up = {0, 1, 0};
     glm_lookat(eye, center, up, context->uniform.view);
@@ -80,19 +76,33 @@ void init(Context* context) {
     uploadBuffer(context, context->buffers[0], context->buffers[2], context->model.indices, context->model.indicesSize);
     uploadBuffer(context, context->buffers[0], context->buffers[3], &context->uniform, sizeof(Uniform));
 
+    context->texture = createTexture(context, "res/textures/cube.png");
+
     VkDescriptorBufferInfo bufferInfo = {};
     bufferInfo.buffer = context->buffers[3].buffer;
     bufferInfo.offset = 0;
     bufferInfo.range = context->buffers[3].size;
 
-    VkWriteDescriptorSet write = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
-    write.dstSet = context->descriptorSet;
-    write.dstBinding = 0;
-    write.descriptorCount = 1;
-    write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    write.pBufferInfo = &bufferInfo;
+    VkDescriptorImageInfo imageInfo = {};
+    imageInfo.sampler = context->texture.sampler;
+    imageInfo.imageView = context->texture.imageView;
+    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-    vkUpdateDescriptorSets(context->device, 1, &write, 0, NULL);
+    VkWriteDescriptorSet writes[2] = {};
+    writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[0].dstSet = context->descriptorSet;
+    writes[0].dstBinding = 0;
+    writes[0].descriptorCount = 1;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].pBufferInfo = &bufferInfo;
+    writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[1].dstSet = context->descriptorSet;
+    writes[1].dstBinding = 1;
+    writes[1].descriptorCount = 1;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    writes[1].pImageInfo = &imageInfo;
+
+    vkUpdateDescriptorSets(context->device, ARRAYSIZE(writes), writes, 0, NULL);
 
     context->acquireSemaphore = createSemaphore(context);
     context->releaseSemaphore = createSemaphore(context);
@@ -172,9 +182,10 @@ void mainLoop(Context* context) {
 
         VkViewport viewport = {};
         viewport.width = (float)context->width;
+        // viewport.y = (float)context->height;
         viewport.height = (float)context->height;
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
+        //viewport.minDepth = 0.0f;
+        //viewport.maxDepth = 1.0f;
 
         vkCmdSetViewport(context->commandBuffer, 0, 1, &viewport);
 
@@ -228,6 +239,7 @@ void clean(Context* context) {
     vkDestroySemaphore(context->device, context->releaseSemaphore, NULL);
     vkDestroySemaphore(context->device, context->acquireSemaphore, NULL);
 
+    destroyTexture(context, context->texture);
     destroyModel(context->model);
 
     destroyBuffer(context, context->buffers[3]);

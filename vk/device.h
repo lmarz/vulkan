@@ -1,4 +1,4 @@
-#include "triangle.h"
+#include "vulkan.h"
 
 VkPhysicalDevice getPhysicalDevice(Context* context) {
     uint32_t gpuCount;

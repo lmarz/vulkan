@@ -1,4 +1,4 @@
-#include "triangle.h"
+#include "vulkan.h"
 
 VkInstance createInstance() {
     VkApplicationInfo appInfo = { VK_STRUCTURE_TYPE_APPLICATION_INFO };

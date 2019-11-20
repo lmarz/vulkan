@@ -1,4 +1,4 @@
-#include "triangle.h"
+#include "vulkan.h"
 
 Model loadModel(const char* path) {
     cgltf_options options = {};

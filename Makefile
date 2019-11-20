@@ -1,18 +1,17 @@
-INCLUDE=-DDEBUG -I. -I./external/cglm/include -I./external/cgltf
+INCLUDE=-DDEBUG -I. -I./external/cglm/include -I./external/cgltf -I./external/stb
 LIBS=-lglfw -lvulkan -lm
 
-all: triangle res/shaders/vert.spv res/shaders/frag.spv
-	@echo "Starting triangle ..."
-	@./triangle
+all: vulkan res/shaders/vert.spv res/shaders/frag.spv
+	@echo "Starting vulkan ..."
+	@./vulkan
 
-triangle: triangle.o
-	@echo "||| triangle.o --->>> triangle |||"
-	@gcc -o triangle triangle.o $(LIBS)
-	@rm triangle.o
+vulkan: vulkan.o
+	@echo "||| vulkan.o --->>> vulkan |||"
+	@gcc -o vulkan vulkan.o $(LIBS)
 
-triangle.o: triangle.c
-	@echo "||| triangle.c --->>> triangle.o |||"
-	@gcc -c triangle.c $(INCLUDE)
+vulkan.o: vulkan.c
+	@echo "||| vulkan.c --->>> vulkan.o |||"
+	@gcc -c vulkan.c $(INCLUDE)
 
 res/shaders/vert.spv: res/shaders/shader.vert
 	@echo "||| shader.vert --->>> vert.spv |||"
@@ -24,4 +23,4 @@ res/shaders/frag.spv: res/shaders/shader.frag
 
 clean:
 	@echo "Cleaning up ..."
-	@rm triangle res/shaders/vert.spv res/shaders/frag.spv
+	@rm vulkan res/shaders/vert.spv res/shaders/frag.spv

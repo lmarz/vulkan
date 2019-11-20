@@ -1,4 +1,4 @@
-#include "triangle.h"
+#include "vulkan.h"
 
 VkFormat getFormat(Context* context) {
     uint32_t formatCount;

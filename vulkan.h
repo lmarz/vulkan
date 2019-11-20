@@ -12,6 +12,9 @@
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
 #define ASSERT(val, pos) if(val != VK_SUCCESS) { printf("Error: %d | %s\n", val, pos); exit(-1); }
 
@@ -39,6 +42,13 @@ typedef struct Uniform {
     mat4 view;
     mat4 model;
 } Uniform;
+
+typedef struct Texture {
+    VkImage image;
+    VkDeviceMemory memory;
+    VkSampler sampler;
+    VkImageView imageView;
+} Texture;
 
 typedef struct Model {
     size_t verticesCount;
@@ -92,6 +102,7 @@ typedef struct Context {
 
     Uniform uniform;
     Model model;
+    Texture texture;
 } Context;
 
 uint32_t selectMemoryType(VkPhysicalDeviceMemoryProperties properties, uint32_t memoryTypeBits, VkMemoryPropertyFlags flags) {
