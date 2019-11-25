@@ -59,13 +59,13 @@ void init(Context* context) {
     context->descriptorPool = createDescriptorPool(context, &size);
     context->descriptorSet = createDescriptorSet(context);
 
+    context->model = loadModel("res/models/cube.gltf");
+
     context->buffers = malloc(sizeof(Buffer) * 4); // scratch vertexbuffer indexbuffer uniformbuffer
     context->buffers[0] = createBuffer(context, 128 * 1024, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    context->buffers[1] = createBuffer(context, 128 * 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    context->buffers[2] = createBuffer(context, 128 * 1024, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    context->buffers[3] = createBuffer(context, 65536, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    context->model = loadModel("res/models/cube.gltf");
+    context->buffers[1] = createBuffer(context, context->model.verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    context->buffers[2] = createBuffer(context, context->model.indicesSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    context->buffers[3] = createBuffer(context, sizeof(Uniform), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     glm_perspective_default((float)context->width / (float)context->height, context->uniform.projection);
     vec3 eye = {0, -2, -5};

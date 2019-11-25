@@ -7,6 +7,13 @@ CC = gcc
 # the object files, which will be created
 OBJECTS := vulkan.o
 OBJECTS += modelloader.o
+OBJECTS += vk/instance.o
+OBJECTS += vk/device.o
+OBJECTS += vk/swapchain.o
+OBJECTS += vk/pipeline.o
+OBJECTS += vk/command.o
+OBJECTS += vk/buffer.o
+OBJECTS += vk/texture.o
 
 # the DEBUG macro. remove for release
 CPPFLAGS = -D DEBUG
