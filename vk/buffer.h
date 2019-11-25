@@ -1,6 +1,15 @@
 #pragma once
 #include "vulkan.h"
 
+uint32_t selectMemoryType(VkPhysicalDeviceMemoryProperties properties, uint32_t memoryTypeBits, VkMemoryPropertyFlags flags) {
+    for(uint32_t i = 0; i < properties.memoryTypeCount; i++) {
+        if((memoryTypeBits & (1 << i)) != 0 && (properties.memoryTypes[i].propertyFlags & flags) == flags) {
+            return i;
+        }
+    }
+    return ~0u;
+}
+
 Buffer createBuffer(Context* context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags flags) {
     VkBufferCreateInfo createInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
     createInfo.size = size;

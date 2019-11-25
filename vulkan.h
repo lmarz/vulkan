@@ -9,10 +9,8 @@
 
 #include <cglm/cglm.h>
 
-#define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
@@ -104,12 +102,3 @@ typedef struct Context {
     Model model;
     Texture texture;
 } Context;
-
-uint32_t selectMemoryType(VkPhysicalDeviceMemoryProperties properties, uint32_t memoryTypeBits, VkMemoryPropertyFlags flags) {
-    for(uint32_t i = 0; i < properties.memoryTypeCount; i++) {
-        if((memoryTypeBits & (1 << i)) != 0 && (properties.memoryTypes[i].propertyFlags & flags) == flags) {
-            return i;
-        }
-    }
-    return ~0u;
-}
