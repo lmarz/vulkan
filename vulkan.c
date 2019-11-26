@@ -154,7 +154,7 @@ void mainLoop(Context* context) {
         vkUpdateDescriptorSets(context->device, 1, &write, 0, NULL);
 
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(context->device, context->swapchain, 0, context->acquireSemaphore, VK_NULL_HANDLE, &imageIndex);
+        ASSERT(vkAcquireNextImageKHR(context->device, context->swapchain, 0, context->acquireSemaphore, VK_NULL_HANDLE, &imageIndex), "next");
 
         ASSERT(vkResetCommandPool(context->device, context->commandPool, 0), "reset");
 
