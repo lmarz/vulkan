@@ -2,7 +2,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "vulkan.h"
 
-#include "vk/instance.h"
 #include "vk/device.h"
 #include "vk/swapchain.h"
 #include "vk/pipeline.h"
@@ -58,6 +57,8 @@ void init(Context* context) {
     VkDescriptorPoolSize size = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 };
     context->descriptorPool = createDescriptorPool(context, &size);
     context->descriptorSet = createDescriptorSet(context);
+    context->acquireSemaphore = createSemaphore(context);
+    context->releaseSemaphore = createSemaphore(context);
 
     context->model = loadModel("res/models/cube.gltf");
 
@@ -105,9 +106,6 @@ void init(Context* context) {
     writes[1].pImageInfo = &imageInfo;
 
     vkUpdateDescriptorSets(context->device, ARRAYSIZE(writes), writes, 0, NULL);
-
-    context->acquireSemaphore = createSemaphore(context);
-    context->releaseSemaphore = createSemaphore(context);
 }
 
 void mainLoop(Context* context) {
@@ -138,7 +136,7 @@ void mainLoop(Context* context) {
         vec3 axis = {0, 1, 0};
         glm_rotate(context->uniform.model, 0.05f, axis);
         uploadBuffer(context, context->buffers[0], context->buffers[3], &context->uniform, sizeof(Uniform));
-    
+
         VkDescriptorBufferInfo bufferInfo = {};
         bufferInfo.buffer = context->buffers[3].buffer;
         bufferInfo.offset = 0;
@@ -156,12 +154,7 @@ void mainLoop(Context* context) {
         uint32_t imageIndex;
         ASSERT(vkAcquireNextImageKHR(context->device, context->swapchain, 0, context->acquireSemaphore, VK_NULL_HANDLE, &imageIndex), "next");
 
-        ASSERT(vkResetCommandPool(context->device, context->commandPool, 0), "reset");
-
-        VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
-        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-        ASSERT(vkBeginCommandBuffer(context->commandBuffer, &beginInfo), "begin");
+        startRecording(context);
 
         VkClearColorValue colorValue = {0.0f, 0.0f, 0.2f, 1.0f};
         VkClearDepthStencilValue depthValue = {1.0f, 0.0f};
@@ -238,9 +231,6 @@ void mainLoop(Context* context) {
 }
 
 void clean(Context* context) {
-    vkDestroySemaphore(context->device, context->releaseSemaphore, NULL);
-    vkDestroySemaphore(context->device, context->acquireSemaphore, NULL);
-
     destroyTexture(context, context->texture);
     destroyModel(context->model);
 
@@ -250,6 +240,8 @@ void clean(Context* context) {
     destroyBuffer(context, context->buffers[0]);
     free(context->buffers);
 
+    vkDestroySemaphore(context->device, context->releaseSemaphore, NULL);
+    vkDestroySemaphore(context->device, context->acquireSemaphore, NULL);
     vkDestroyDescriptorPool(context->device, context->descriptorPool, NULL);
     vkDestroyCommandPool(context->device, context->commandPool, NULL);
 

@@ -115,7 +115,6 @@ DepthStencil createDepthStencil(Context* context) {
 }
 
 VkRenderPass createRenderPass(Context* context) {
-
     VkAttachmentDescription attachments[2] = {};
     attachments[0].format = context->format;
     attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;

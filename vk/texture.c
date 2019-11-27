@@ -1,11 +1,7 @@
 #include "texture.h"
 
 void uploadTexture(Context* context, VkImage image, int x, int y, Buffer staging) {
-    ASSERT(vkResetCommandPool(context->device, context->commandPool, 0), "reset");
-
-    VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-    ASSERT(vkBeginCommandBuffer(context->commandBuffer, &beginInfo), "begin");
+    startRecording(context);
 
     VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
     imageMemoryBarrier.srcAccessMask = 0;
@@ -47,15 +43,7 @@ void uploadTexture(Context* context, VkImage image, int x, int y, Buffer staging
 
     vkCmdPipelineBarrier(context->commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, NULL, 0, NULL, 1, &imageMemoryBarrier);
 
-    ASSERT(vkEndCommandBuffer(context->commandBuffer), "end");
-
-    VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &context->commandBuffer;
-
-    ASSERT(vkQueueSubmit(context->queue, 1, &submitInfo, VK_NULL_HANDLE), "submit");
-
-    ASSERT(vkDeviceWaitIdle(context->device), "wait");
+    endRecording(context);
 
     destroyBuffer(context, staging);
 }

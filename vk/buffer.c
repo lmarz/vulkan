@@ -48,25 +48,12 @@ Buffer createBuffer(Context* context, VkDeviceSize size, VkBufferUsageFlags usag
 void uploadBuffer(Context* context, Buffer scratch, Buffer buf, void* data, size_t size) {
     memcpy(scratch.data, data, size);
 
-    ASSERT(vkResetCommandPool(context->device, context->commandPool, 0), "reset");
-
-    VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    ASSERT(vkBeginCommandBuffer(context->commandBuffer, &beginInfo), "begin");
+    startRecording(context);
 
     VkBufferCopy region = {0, 0, size};
     vkCmdCopyBuffer(context->commandBuffer, scratch.buffer, buf.buffer, 1, &region);
 
-    ASSERT(vkEndCommandBuffer(context->commandBuffer), "end");
-
-    VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &context->commandBuffer;
-
-    ASSERT(vkQueueSubmit(context->queue, 1, &submitInfo, VK_NULL_HANDLE), "submit");
-
-    ASSERT(vkDeviceWaitIdle(context->device), "wait");
+    endRecording(context);
 }
 
 void destroyBuffer(Context* context, Buffer buffer) {

@@ -50,3 +50,24 @@ VkSemaphore createSemaphore(Context* context) {
     ASSERT(vkCreateSemaphore(context->device, &createInfo, NULL, &semaphore), "semaphore");
     return semaphore;
 }
+
+void startRecording(Context* context) {
+    ASSERT(vkResetCommandPool(context->device, context->commandPool, 0), "reset");
+
+    VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    ASSERT(vkBeginCommandBuffer(context->commandBuffer, &beginInfo), "begin");
+}
+
+void endRecording(Context* context) {
+    ASSERT(vkEndCommandBuffer(context->commandBuffer), "end");
+
+    VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &context->commandBuffer;
+
+    ASSERT(vkQueueSubmit(context->queue, 1, &submitInfo, VK_NULL_HANDLE), "submit");
+
+    ASSERT(vkDeviceWaitIdle(context->device), "wait");
+}

@@ -1,7 +1,6 @@
 #include "pipeline.h"
 
 VkShaderModule loadShader(Context* context, const char* path) {
-
     FILE* file = fopen(path, "rb");
     if(!file) { printf("FnF\n"); exit(-1); }
     fseek(file, 0, SEEK_END);
@@ -25,7 +24,6 @@ VkShaderModule loadShader(Context* context, const char* path) {
 }
 
 VkDescriptorSetLayout createSetLayout(Context* context, uint32_t bindingCount, VkDescriptorSetLayoutBinding* bindings) {
-
     VkDescriptorSetLayoutCreateInfo createInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
     createInfo.bindingCount = bindingCount;
     createInfo.pBindings = bindings;
@@ -129,7 +127,7 @@ VkPipeline createGraphicsPipeline(Context* context) {
     createInfo.pDynamicState = &dynamicState;
     createInfo.layout = context->layout;
     createInfo.renderPass = context->renderPass;
-    
+
     VkPipeline pipeline;
     ASSERT(vkCreateGraphicsPipelines(context->device, NULL, 1, &createInfo, NULL, &pipeline), "graphicsPipeline");
 

@@ -7,7 +7,7 @@ Model loadModel(const char* path) {
     if(result != cgltf_result_success) { printf("Error while loading %s\n", path); exit(-1); }
     result = cgltf_load_buffers(&options, data, path);
     if(result != cgltf_result_success) { printf("Error while loading buffers of %s\n", path); exit(-1); }
-    
+
     Model model;
     model.verticesCount = data->meshes[0].primitives[0].attributes[0].data->count;
     model.vertices = (Vertex*)malloc(model.verticesCount * sizeof(Vertex));
