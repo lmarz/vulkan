@@ -35,6 +35,12 @@ typedef struct Buffer {
     void* data;
 } Buffer;
 
+typedef struct Pipeline {
+    VkDescriptorSetLayout setLayout;
+    VkPipelineLayout layout;
+    VkPipeline pipeline;
+} Pipeline;
+
 typedef struct Uniform {
     mat4 projection;
     mat4 view;
@@ -52,9 +58,14 @@ typedef struct Model {
     size_t verticesCount;
     Vertex* vertices;
     size_t verticesSize;
+    Buffer vertexBuffer;
+
     size_t indicesCount;
     uint16_t* indices;
     size_t indicesSize;
+    Buffer indexBuffer;
+
+    Buffer uniformBuffer;
 } Model;
 
 typedef struct Context {
@@ -102,3 +113,9 @@ typedef struct Context {
     Model model;
     Texture texture;
 } Context;
+
+// User functions
+void initialize(Context* context);
+void gameLoop(Context* context);
+void renderLoop(Context* context);
+void cleanUp(Context* context);

@@ -11,6 +11,8 @@
 
 #include "modelloader.h"
 
+#include "entity.h"
+
 void init(Context* context) {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -38,7 +40,7 @@ void init(Context* context) {
     context->vertexShader = loadShader(context, "res/shaders/vert.spv");
     context->fragmentShader = loadShader(context, "res/shaders/frag.spv");
 
-    VkDescriptorSetLayoutBinding bindings[2] = {};
+    VkDescriptorSetLayoutBinding bindings[3] = {};
     bindings[0].binding = 0;
     bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     bindings[0].descriptorCount = 1;
@@ -47,6 +49,10 @@ void init(Context* context) {
     bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     bindings[1].descriptorCount = 1;
     bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    bindings[2].binding = 2;
+    bindings[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[2].descriptorCount = 1;
+    bindings[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     context->setLayout = createSetLayout(context, ARRAYSIZE(bindings), bindings);
     context->layout = createPipelineLayout(context);
@@ -54,14 +60,19 @@ void init(Context* context) {
 
     context->commandPool = createCommandPool(context);
     context->commandBuffer = createCommandBuffer(context);
-    VkDescriptorPoolSize size = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 };
-    context->descriptorPool = createDescriptorPool(context, &size);
+    VkDescriptorPoolSize sizes[3];
+    sizes[0].descriptorCount = 1;
+    sizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    sizes[1].descriptorCount = 1;
+    sizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    sizes[2].descriptorCount = 1;
+    sizes[2].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    context->descriptorPool = createDescriptorPool(context, sizes);
     context->descriptorSet = createDescriptorSet(context);
     context->acquireSemaphore = createSemaphore(context);
     context->releaseSemaphore = createSemaphore(context);
 
     context->model = loadModel("res/models/cube.gltf");
-
     context->buffers = malloc(sizeof(Buffer) * 4); // scratch vertexbuffer indexbuffer uniformbuffer
     context->buffers[0] = createBuffer(context, 128 * 1024, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     context->buffers[1] = createBuffer(context, context->model.verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -259,6 +270,27 @@ void clean(Context* context) {
     vkDestroyInstance(context->instance, NULL);
 
     glfwTerminate();
+}
+
+Pipeline pipeline;
+Entity entity;
+
+void initialize(Context* context) {
+    pipeline = createPipeline(context, "res/shaders/vert.spv", "res/shaders/frag.spv");
+    entity = createEntity(context, "res/models/cube.gltf", "res/textures/cube.png", pipeline);
+}
+
+void gameLoop(Context* context) {
+    prepareEntity(context, entity);
+}
+
+void renderLoop(Context* context) {
+    renderEntity(context, entity);
+}
+
+void cleanUp(Context* context) {
+    destroyEntity(context, entity);
+    destroyPipeline(context, pipeline);
 }
 
 int main(int argc, char const *argv[]) {

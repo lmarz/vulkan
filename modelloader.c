@@ -12,6 +12,7 @@ Model loadModel(const char* path) {
     model.verticesCount = data->meshes[0].primitives[0].attributes[0].data->count;
     model.vertices = (Vertex*)malloc(model.verticesCount * sizeof(Vertex));
     model.verticesSize = model.verticesCount * sizeof(Vertex);
+    model.vertexBuffer = (Buffer){};
 
     for(int i = 0; i < data->meshes[0].primitives[0].attributes_count; i++) {
         cgltf_attribute attr = data->meshes[0].primitives[0].attributes[i];
@@ -64,6 +65,9 @@ Model loadModel(const char* path) {
     model.indicesCount = indi->count;
     model.indices = indices;
     model.indicesSize = indi->count * sizeof(uint16_t);
+    model.indexBuffer = (Buffer){};
+
+    model.uniformBuffer = (Buffer){};
 
     cgltf_free(data);
 
