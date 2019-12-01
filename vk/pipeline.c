@@ -33,25 +33,25 @@ VkDescriptorSetLayout createSetLayout(Context* context, uint32_t bindingCount, V
     return setLayout;
 }
 
-VkPipelineLayout createPipelineLayout(Context* context) {
+VkPipelineLayout createPipelineLayout(Context* context, VkDescriptorSetLayout setLayout) {
     VkPipelineLayoutCreateInfo createInfo = { VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
     createInfo.setLayoutCount = 1;
-    createInfo.pSetLayouts = &context->setLayout;
+    createInfo.pSetLayouts = &setLayout;
 
     VkPipelineLayout layout;
     ASSERT(vkCreatePipelineLayout(context->device, &createInfo, NULL, &layout), "layout");
     return layout;
 }
 
-VkPipeline createGraphicsPipeline(Context* context) {
+VkPipeline createGraphicsPipeline(Context* context, VkShaderModule vertexShader, VkShaderModule fragmentShader, VkPipelineLayout layout) {
     VkPipelineShaderStageCreateInfo shaderCreateInfos[2] = {};
     shaderCreateInfos[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderCreateInfos[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-    shaderCreateInfos[0].module = context->vertexShader;
+    shaderCreateInfos[0].module = vertexShader;
     shaderCreateInfos[0].pName = "main";
     shaderCreateInfos[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderCreateInfos[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    shaderCreateInfos[1].module = context->fragmentShader;
+    shaderCreateInfos[1].module = fragmentShader;
     shaderCreateInfos[1].pName = "main";
 
     VkVertexInputBindingDescription bindingDescription;
@@ -125,14 +125,14 @@ VkPipeline createGraphicsPipeline(Context* context) {
     createInfo.pDepthStencilState = &depthStencilState;
     createInfo.pColorBlendState = &colorBlendState;
     createInfo.pDynamicState = &dynamicState;
-    createInfo.layout = context->layout;
+    createInfo.layout = layout;
     createInfo.renderPass = context->renderPass;
 
     VkPipeline pipeline;
     ASSERT(vkCreateGraphicsPipelines(context->device, NULL, 1, &createInfo, NULL, &pipeline), "graphicsPipeline");
 
-    vkDestroyShaderModule(context->device, context->fragmentShader, NULL);
-    vkDestroyShaderModule(context->device, context->vertexShader, NULL);
+    vkDestroyShaderModule(context->device, fragmentShader, NULL);
+    vkDestroyShaderModule(context->device, vertexShader, NULL);
 
     return pipeline;
 }

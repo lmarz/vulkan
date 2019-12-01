@@ -32,11 +32,11 @@ VkDescriptorPool createDescriptorPool(Context* context, VkDescriptorPoolSize* po
     return descriptorPool;
 }
 
-VkDescriptorSet createDescriptorSet(Context* context) {
+VkDescriptorSet createDescriptorSet(Context* context, VkDescriptorSetLayout setLayout) {
     VkDescriptorSetAllocateInfo allocInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
     allocInfo.descriptorPool = context->descriptorPool;
     allocInfo.descriptorSetCount = 1;
-    allocInfo.pSetLayouts = &context->setLayout;
+    allocInfo.pSetLayouts = &setLayout;
 
     VkDescriptorSet descriptorSet;
     ASSERT(vkAllocateDescriptorSets(context->device, &allocInfo, &descriptorSet), "descriptorSet");

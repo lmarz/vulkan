@@ -37,6 +37,7 @@ typedef struct Buffer {
 
 typedef struct Pipeline {
     VkDescriptorSetLayout setLayout;
+    VkDescriptorSet descriptorSet;
     VkPipelineLayout layout;
     VkPipeline pipeline;
 } Pipeline;
@@ -68,6 +69,13 @@ typedef struct Model {
     Buffer uniformBuffer;
 } Model;
 
+typedef struct Entity {
+    Model model;
+    Texture texture;
+    Pipeline pipeline;
+    mat4 modelMatrix;
+} Entity;
+
 typedef struct Context {
     int width;
     int height;
@@ -93,25 +101,16 @@ typedef struct Context {
     VkImageView* swapchainImageViews;
     VkFramebuffer* framebuffers;
 
-    VkShaderModule vertexShader;
-    VkShaderModule fragmentShader;
-    VkDescriptorSetLayout setLayout;
-    VkPipelineLayout layout;
-    VkPipeline pipeline;
-
     VkCommandPool commandPool;
     VkCommandBuffer commandBuffer;
     VkDescriptorPool descriptorPool;
-    VkDescriptorSet descriptorSet;
 
-    Buffer* buffers;
+    Buffer stagingBuffer;
 
     VkSemaphore acquireSemaphore;
     VkSemaphore releaseSemaphore;
 
     Uniform uniform;
-    Model model;
-    Texture texture;
 } Context;
 
 // User functions

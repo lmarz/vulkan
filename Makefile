@@ -7,6 +7,7 @@ CC = gcc
 # the object files, which will be created
 OBJECTS := vulkan.o
 OBJECTS += modelloader.o
+OBJECTS += entity.o
 OBJECTS += vk/device.o
 OBJECTS += vk/swapchain.o
 OBJECTS += vk/pipeline.o
