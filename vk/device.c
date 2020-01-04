@@ -20,7 +20,7 @@ VkInstance createInstance() {
     createInfo.ppEnabledExtensionNames = extensions;
 
     VkInstance instance;
-    ASSERT(vkCreateInstance(&createInfo, NULL, &instance), "instance");
+    ASSERT(vkCreateInstance(&createInfo, NULL, &instance));
     return instance;
 }
 
@@ -78,7 +78,7 @@ VkDevice createDevice(Context* context) {
     createInfo.ppEnabledExtensionNames = extensions;
 
     VkDevice device;
-    ASSERT(vkCreateDevice(context->physicalDevice, &createInfo, NULL, &device), "device");
+    ASSERT(vkCreateDevice(context->physicalDevice, &createInfo, NULL, &device));
     return device;
 }
 

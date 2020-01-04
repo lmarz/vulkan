@@ -91,7 +91,7 @@ void mainLoop(Context* context) {
         gameLoop(context);
 
         uint32_t imageIndex;
-        ASSERT(vkAcquireNextImageKHR(context->device, context->swapchain, 0, context->acquireSemaphore, VK_NULL_HANDLE, &imageIndex), "next");
+        ASSERT(vkAcquireNextImageKHR(context->device, context->swapchain, 0, context->acquireSemaphore, VK_NULL_HANDLE, &imageIndex));
 
         startRecording(context);
 
@@ -135,7 +135,7 @@ void mainLoop(Context* context) {
 
         vkCmdEndRenderPass(context->commandBuffer);
 
-        ASSERT(vkEndCommandBuffer(context->commandBuffer), "end");
+        ASSERT(vkEndCommandBuffer(context->commandBuffer));
 
         VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
@@ -148,7 +148,7 @@ void mainLoop(Context* context) {
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = &context->releaseSemaphore;
 
-        ASSERT(vkQueueSubmit(context->queue, 1, &submitInfo, VK_NULL_HANDLE), "submit");
+        ASSERT(vkQueueSubmit(context->queue, 1, &submitInfo, VK_NULL_HANDLE));
 
         VkPresentInfoKHR presentInfo = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
         presentInfo.waitSemaphoreCount = 1;
@@ -157,9 +157,9 @@ void mainLoop(Context* context) {
         presentInfo.pSwapchains = &context->swapchain;
         presentInfo.pImageIndices = &imageIndex;
 
-        ASSERT(vkQueuePresentKHR(context->queue, &presentInfo), "present");
+        ASSERT(vkQueuePresentKHR(context->queue, &presentInfo));
 
-        ASSERT(vkDeviceWaitIdle(context->device), "wait");
+        ASSERT(vkDeviceWaitIdle(context->device));
     }
 }
 

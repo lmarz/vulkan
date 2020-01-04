@@ -15,7 +15,7 @@ Buffer createBuffer(Context* context, VkDeviceSize size, VkBufferUsageFlags usag
     createInfo.usage = usage;
 
     VkBuffer buffer;
-    ASSERT(vkCreateBuffer(context->device, &createInfo, NULL, &buffer), "buffer");
+    ASSERT(vkCreateBuffer(context->device, &createInfo, NULL, &buffer));
 
     VkMemoryRequirements requirements;
     vkGetBufferMemoryRequirements(context->device, buffer, &requirements);
@@ -29,12 +29,12 @@ Buffer createBuffer(Context* context, VkDeviceSize size, VkBufferUsageFlags usag
     allocInfo.memoryTypeIndex = memoryTypeIndex;
 
     VkDeviceMemory memory;
-    ASSERT(vkAllocateMemory(context->device, &allocInfo, NULL, &memory), "allocateMemory");
-    ASSERT(vkBindBufferMemory(context->device, buffer, memory, 0), "bindMemory");
+    ASSERT(vkAllocateMemory(context->device, &allocInfo, NULL, &memory));
+    ASSERT(vkBindBufferMemory(context->device, buffer, memory, 0));
 
     void* data;
     if(flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
-        ASSERT(vkMapMemory(context->device, memory, 0, size, 0, &data), "mapMem");
+        ASSERT(vkMapMemory(context->device, memory, 0, size, 0, &data));
 
     Buffer buf;
     buf.buffer = buffer;

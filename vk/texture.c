@@ -74,7 +74,7 @@ Texture createTexture(Context* context, const char* path) {
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     VkImage image;
-    ASSERT(vkCreateImage(context->device, &imageInfo, NULL, &image), "image");
+    ASSERT(vkCreateImage(context->device, &imageInfo, NULL, &image));
 
     VkMemoryRequirements requirements;
     vkGetImageMemoryRequirements(context->device, image, &requirements);
@@ -87,8 +87,8 @@ Texture createTexture(Context* context, const char* path) {
     allocInfo.memoryTypeIndex = selectMemoryType(properties, requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     VkDeviceMemory memory;
-    ASSERT(vkAllocateMemory(context->device, &allocInfo, NULL, &memory), "memory");
-    ASSERT(vkBindImageMemory(context->device, image, memory, 0), "bind");
+    ASSERT(vkAllocateMemory(context->device, &allocInfo, NULL, &memory));
+    ASSERT(vkBindImageMemory(context->device, image, memory, 0));
 
     uploadTexture(context, image, x, y, staging);
 
@@ -110,7 +110,7 @@ Texture createTexture(Context* context, const char* path) {
     samplerInfo.unnormalizedCoordinates = VK_FALSE;
 
     VkSampler sampler;
-    ASSERT(vkCreateSampler(context->device, &samplerInfo, NULL, &sampler), "sampler");
+    ASSERT(vkCreateSampler(context->device, &samplerInfo, NULL, &sampler));
 
     VkImageViewCreateInfo createInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
     createInfo.image = image;
@@ -127,7 +127,7 @@ Texture createTexture(Context* context, const char* path) {
     createInfo.subresourceRange.levelCount = 1;
 
     VkImageView imageView;
-    ASSERT(vkCreateImageView(context->device, &createInfo, NULL, &imageView), "imageView");
+    ASSERT(vkCreateImageView(context->device, &createInfo, NULL, &imageView));
 
     Texture texture;
     texture.image = image;

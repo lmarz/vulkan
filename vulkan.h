@@ -14,7 +14,7 @@
 #include <stb_image.h>
 
 #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
-#define ASSERT(val, pos) if(val != VK_SUCCESS) { printf("Error: %d | %s\n", val, pos); exit(-1); }
+#define ASSERT(val) if(val != VK_SUCCESS) { printf("Error: %d in line %d of %s\n", val, __LINE__, __FILE__); exit(-1); }
 
 typedef struct DepthStencil {
     VkImage image;

@@ -18,7 +18,7 @@ VkShaderModule loadShader(Context* context, const char* path) {
     createInfo.pCode = buffer;
 
     VkShaderModule shader;
-    ASSERT(vkCreateShaderModule(context->device, &createInfo, NULL, &shader), "shader");
+    ASSERT(vkCreateShaderModule(context->device, &createInfo, NULL, &shader));
     free(buffer);
     return shader;
 }
@@ -29,7 +29,7 @@ VkDescriptorSetLayout createSetLayout(Context* context, uint32_t bindingCount, V
     createInfo.pBindings = bindings;
 
     VkDescriptorSetLayout setLayout;
-    ASSERT(vkCreateDescriptorSetLayout(context->device, &createInfo, NULL, &setLayout), "setLayout");
+    ASSERT(vkCreateDescriptorSetLayout(context->device, &createInfo, NULL, &setLayout));
     return setLayout;
 }
 
@@ -39,7 +39,7 @@ VkPipelineLayout createPipelineLayout(Context* context, VkDescriptorSetLayout se
     createInfo.pSetLayouts = &setLayout;
 
     VkPipelineLayout layout;
-    ASSERT(vkCreatePipelineLayout(context->device, &createInfo, NULL, &layout), "layout");
+    ASSERT(vkCreatePipelineLayout(context->device, &createInfo, NULL, &layout));
     return layout;
 }
 
@@ -129,7 +129,7 @@ VkPipeline createGraphicsPipeline(Context* context, VkShaderModule vertexShader,
     createInfo.renderPass = context->renderPass;
 
     VkPipeline pipeline;
-    ASSERT(vkCreateGraphicsPipelines(context->device, NULL, 1, &createInfo, NULL, &pipeline), "graphicsPipeline");
+    ASSERT(vkCreateGraphicsPipelines(context->device, NULL, 1, &createInfo, NULL, &pipeline));
 
     vkDestroyShaderModule(context->device, fragmentShader, NULL);
     vkDestroyShaderModule(context->device, vertexShader, NULL);

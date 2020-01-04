@@ -2,9 +2,9 @@
 
 VkFormat getFormat(Context* context) {
     uint32_t formatCount;
-    ASSERT(vkGetPhysicalDeviceSurfaceFormatsKHR(context->physicalDevice, context->surface, &formatCount, NULL), "formats");
+    ASSERT(vkGetPhysicalDeviceSurfaceFormatsKHR(context->physicalDevice, context->surface, &formatCount, NULL));
     VkSurfaceFormatKHR formats[formatCount];
-    ASSERT(vkGetPhysicalDeviceSurfaceFormatsKHR(context->physicalDevice, context->surface, &formatCount, formats), "formats");
+    ASSERT(vkGetPhysicalDeviceSurfaceFormatsKHR(context->physicalDevice, context->surface, &formatCount, formats));
 
     if(formats[0].format == VK_FORMAT_UNDEFINED) {
         return VK_FORMAT_B8G8R8_UNORM;
@@ -28,10 +28,10 @@ VkFormat getDepthFormat(Context* context) {
 
 VkSwapchainKHR createSwapchain(Context* context) {
     VkBool32 supported;
-    ASSERT(vkGetPhysicalDeviceSurfaceSupportKHR(context->physicalDevice, context->familyIndex, context->surface, &supported), "supported");
+    ASSERT(vkGetPhysicalDeviceSurfaceSupportKHR(context->physicalDevice, context->familyIndex, context->surface, &supported));
 
     VkSurfaceCapabilitiesKHR capabilities;
-    ASSERT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(context->physicalDevice, context->surface, &capabilities), "capabilities");
+    ASSERT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(context->physicalDevice, context->surface, &capabilities));
 
     VkCompositeAlphaFlagBitsKHR surfaceComposite = (capabilities.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) ? VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR :\
                                                    (capabilities.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR) ? VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR :\
@@ -58,7 +58,7 @@ VkSwapchainKHR createSwapchain(Context* context) {
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
     VkSwapchainKHR swapchain;
-    ASSERT(vkCreateSwapchainKHR(context->device, &createInfo, NULL, &swapchain), "swapchain");
+    ASSERT(vkCreateSwapchainKHR(context->device, &createInfo, NULL, &swapchain));
     return swapchain;
 }
 
@@ -77,7 +77,7 @@ DepthStencil createDepthStencil(Context* context) {
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     VkImage image;
-    ASSERT(vkCreateImage(context->device, &imageInfo, NULL, &image), "depthImage");
+    ASSERT(vkCreateImage(context->device, &imageInfo, NULL, &image));
 
     VkMemoryRequirements requirements;
     vkGetImageMemoryRequirements(context->device, image, &requirements);
@@ -90,8 +90,8 @@ DepthStencil createDepthStencil(Context* context) {
     allocInfo.memoryTypeIndex = selectMemoryType(properties, requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     VkDeviceMemory memory;
-    ASSERT(vkAllocateMemory(context->device, &allocInfo, NULL, &memory), "depthMemory");
-    ASSERT(vkBindImageMemory(context->device, image, memory, 0), "depthBind");
+    ASSERT(vkAllocateMemory(context->device, &allocInfo, NULL, &memory));
+    ASSERT(vkBindImageMemory(context->device, image, memory, 0));
 
     VkImageViewCreateInfo createInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
     createInfo.image = image;
@@ -104,7 +104,7 @@ DepthStencil createDepthStencil(Context* context) {
     createInfo.subresourceRange.layerCount = 1;
 
     VkImageView imageView;
-    ASSERT(vkCreateImageView(context->device, &createInfo, NULL, &imageView), "depthView");
+    ASSERT(vkCreateImageView(context->device, &createInfo, NULL, &imageView));
 
     DepthStencil depthStencil;
     depthStencil.image = image;
@@ -170,19 +170,19 @@ VkRenderPass createRenderPass(Context* context) {
     createInfo.pDependencies = dependencies;
 
     VkRenderPass renderPass;
-    ASSERT(vkCreateRenderPass(context->device, &createInfo, NULL, &renderPass), "renderPass");
+    ASSERT(vkCreateRenderPass(context->device, &createInfo, NULL, &renderPass));
     return renderPass;
 }
 
 uint32_t getSwapchainImageCount(Context* context) {
     uint32_t imageCount;
-    ASSERT(vkGetSwapchainImagesKHR(context->device, context->swapchain, &imageCount, NULL), "imageCount");
+    ASSERT(vkGetSwapchainImagesKHR(context->device, context->swapchain, &imageCount, NULL));
     return imageCount;
 }
 
 VkImage* getSwapchainImages(Context* context) {
     VkImage* images = malloc(sizeof(VkImage) * context->swapchainImageCount);
-    ASSERT(vkGetSwapchainImagesKHR(context->device, context->swapchain, &context->swapchainImageCount, images), "swapcainImages");
+    ASSERT(vkGetSwapchainImagesKHR(context->device, context->swapchain, &context->swapchainImageCount, images));
     return images;
 }
 
@@ -204,7 +204,7 @@ VkImageView* createSwapchainImageViews(Context* context) {
 
     for(int i = 0; i < context->swapchainImageCount; i++) {
         createInfo.image = context->swapchainImages[i];
-        ASSERT(vkCreateImageView(context->device, &createInfo, NULL, &imageViews[i]), "swapchainImageViews");
+        ASSERT(vkCreateImageView(context->device, &createInfo, NULL, &imageViews[i]));
     }
     return imageViews;
 }
@@ -227,7 +227,7 @@ VkFramebuffer* createFramebuffers(Context* context) {
     for(int i = 0; i < context->swapchainImageCount; i++) {
         attachments[0] = context->swapchainImageViews[i];
         // Maybe? createInfo.pAttachments = attachments;
-        ASSERT(vkCreateFramebuffer(context->device, &createInfo, NULL, &framebuffers[i]), "framebuffers");
+        ASSERT(vkCreateFramebuffer(context->device, &createInfo, NULL, &framebuffers[i]));
     }
     return framebuffers;
 }

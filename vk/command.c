@@ -6,7 +6,7 @@ VkCommandPool createCommandPool(Context* context) {
     createInfo.queueFamilyIndex = context->familyIndex;
 
     VkCommandPool commandPool;
-    ASSERT(vkCreateCommandPool(context->device, &createInfo, NULL, &commandPool), "commandPool");
+    ASSERT(vkCreateCommandPool(context->device, &createInfo, NULL, &commandPool));
     return commandPool;
 }
 
@@ -17,7 +17,7 @@ VkCommandBuffer createCommandBuffer(Context* context) {
     allocInfo.commandBufferCount = 1;
 
     VkCommandBuffer commandBuffer;
-    ASSERT(vkAllocateCommandBuffers(context->device, &allocInfo, &commandBuffer), "commandBuffer");
+    ASSERT(vkAllocateCommandBuffers(context->device, &allocInfo, &commandBuffer));
     return commandBuffer;
 }
 
@@ -28,7 +28,7 @@ VkDescriptorPool createDescriptorPool(Context* context, VkDescriptorPoolSize* po
     createInfo.pPoolSizes = poolSizes;
 
     VkDescriptorPool descriptorPool;
-    ASSERT(vkCreateDescriptorPool(context->device, &createInfo, NULL, &descriptorPool), "descriptorPool");
+    ASSERT(vkCreateDescriptorPool(context->device, &createInfo, NULL, &descriptorPool));
     return descriptorPool;
 }
 
@@ -39,7 +39,7 @@ VkDescriptorSet createDescriptorSet(Context* context, VkDescriptorSetLayout setL
     allocInfo.pSetLayouts = &setLayout;
 
     VkDescriptorSet descriptorSet;
-    ASSERT(vkAllocateDescriptorSets(context->device, &allocInfo, &descriptorSet), "descriptorSet");
+    ASSERT(vkAllocateDescriptorSets(context->device, &allocInfo, &descriptorSet));
     return descriptorSet;
 }
 
@@ -47,27 +47,27 @@ VkSemaphore createSemaphore(Context* context) {
     VkSemaphoreCreateInfo createInfo = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
 
     VkSemaphore semaphore;
-    ASSERT(vkCreateSemaphore(context->device, &createInfo, NULL, &semaphore), "semaphore");
+    ASSERT(vkCreateSemaphore(context->device, &createInfo, NULL, &semaphore));
     return semaphore;
 }
 
 void startRecording(Context* context) {
-    ASSERT(vkResetCommandPool(context->device, context->commandPool, 0), "reset");
+    ASSERT(vkResetCommandPool(context->device, context->commandPool, 0));
 
     VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    ASSERT(vkBeginCommandBuffer(context->commandBuffer, &beginInfo), "begin");
+    ASSERT(vkBeginCommandBuffer(context->commandBuffer, &beginInfo));
 }
 
 void endRecording(Context* context) {
-    ASSERT(vkEndCommandBuffer(context->commandBuffer), "end");
+    ASSERT(vkEndCommandBuffer(context->commandBuffer));
 
     VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &context->commandBuffer;
 
-    ASSERT(vkQueueSubmit(context->queue, 1, &submitInfo, VK_NULL_HANDLE), "submit");
+    ASSERT(vkQueueSubmit(context->queue, 1, &submitInfo, VK_NULL_HANDLE));
 
-    ASSERT(vkDeviceWaitIdle(context->device), "wait");
+    ASSERT(vkDeviceWaitIdle(context->device));
 }
