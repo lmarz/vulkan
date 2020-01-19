@@ -1,3 +1,4 @@
+#define CGLTF_IMPLEMENTATION
 #include "modelloader.h"
 
 Model loadModel(const char* path) {

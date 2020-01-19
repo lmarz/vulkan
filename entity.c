@@ -4,7 +4,7 @@ Pipeline createPipeline(Context* context, const char* vertexShaderPath, const ch
     VkShaderModule vertexShader = loadShader(context, vertexShaderPath);
     VkShaderModule fragmentShader = loadShader(context, fragmentShaderPath);
 
-    VkDescriptorSetLayoutBinding bindings[3] = {};
+    VkDescriptorSetLayoutBinding bindings[2] = {};
     bindings[0].binding = 0;
     bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     bindings[0].descriptorCount = 1;
@@ -13,10 +13,6 @@ Pipeline createPipeline(Context* context, const char* vertexShaderPath, const ch
     bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     bindings[1].descriptorCount = 1;
     bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    bindings[2].binding = 2;
-    bindings[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    bindings[2].descriptorCount = 1;
-    bindings[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     Pipeline pipeline;
     pipeline.setLayout = createSetLayout(context, ARRAYSIZE(bindings), bindings);

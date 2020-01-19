@@ -16,7 +16,7 @@ OBJECTS += vk/buffer.o
 OBJECTS += vk/texture.o
 
 # the DEBUG macro. remove for release
-CPPFLAGS = -D DEBUG
+CPPFLAGS = -D DEBUG -g
 
 # the include paths
 CFLAGS = -I. -I./external/cglm/include -I./external/cgltf -I./external/stb

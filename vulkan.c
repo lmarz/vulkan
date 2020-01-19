@@ -1,5 +1,3 @@
-#define CGLTF_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
 #include "vulkan.h"
 
 #include "vk/device.h"

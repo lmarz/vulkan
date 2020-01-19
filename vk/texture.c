@@ -1,3 +1,4 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include "texture.h"
 
 void uploadTexture(Context* context, VkImage image, int x, int y, Buffer staging) {
