@@ -2,7 +2,7 @@
 
 VkInstance createInstance() {
     VkApplicationInfo appInfo = { VK_STRUCTURE_TYPE_APPLICATION_INFO };
-    appInfo.apiVersion = VK_API_VERSION_1_1;
+    appInfo.apiVersion = VK_API_VERSION_1_2;
 
     uint32_t extensionCount;
     const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
@@ -39,7 +39,7 @@ VkPhysicalDevice getPhysicalDevice(Context* context) {
     for(int i = 0; i < gpuCount; i++) {
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(gpus[i], &properties);
-        if(properties.apiVersion >= VK_API_VERSION_1_1 && properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+        if(properties.apiVersion >= VK_API_VERSION_1_2 && properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
             return gpus[i];
         }
     }

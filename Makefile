@@ -33,10 +33,10 @@ $(TARGET): $(OBJECTS)
 $(OBJECTS): %.o: %.c
 
 res/shaders/vert.spv: res/shaders/shader.vert
-	glslangValidator --target-env vulkan1.1 -o res/shaders/vert.spv res/shaders/shader.vert
+	glslangValidator --target-env vulkan1.2 -o res/shaders/vert.spv res/shaders/shader.vert
 
 res/shaders/frag.spv: res/shaders/shader.frag
-	glslangValidator --target-env vulkan1.1 -o res/shaders/frag.spv res/shaders/shader.frag
+	glslangValidator --target-env vulkan1.2 -o res/shaders/frag.spv res/shaders/shader.frag
 
 clean:
 	-rm $(TARGET) $(OBJECTS) res/shaders/vert.spv res/shaders/frag.spv
