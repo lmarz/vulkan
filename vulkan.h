@@ -112,9 +112,3 @@ typedef struct Context {
 
     Uniform uniform;
 } Context;
-
-// User functions
-void initialize(Context* context);
-void gameLoop(Context* context);
-void renderLoop(Context* context);
-void cleanUp(Context* context);
