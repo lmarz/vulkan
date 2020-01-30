@@ -37,9 +37,9 @@ Model loadModel(const char* path) {
             memcpy(normal, attr.data->buffer_view->buffer->data + attr.data->buffer_view->offset, attr.data->buffer_view->size);
             int k = 0;
             for(int j = 0; j < model.verticesCount; j++) {
-                model.vertices[i].normal[0] = normal[k];
-                model.vertices[i].normal[1] = normal[k+1];
-                model.vertices[i].normal[2] = normal[k+2];
+                model.vertices[j].normal[0] = normal[k];
+                model.vertices[j].normal[1] = normal[k+1];
+                model.vertices[j].normal[2] = normal[k+2];
                 k += 3;
             }
             free(normal);
