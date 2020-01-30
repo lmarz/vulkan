@@ -8,6 +8,7 @@ CC = gcc
 OBJECTS := vulkan.o
 OBJECTS += modelloader.o
 OBJECTS += entity.o
+OBJECTS += vk/renderer.o
 OBJECTS += vk/device.o
 OBJECTS += vk/swapchain.o
 OBJECTS += vk/pipeline.o
