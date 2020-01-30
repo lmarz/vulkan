@@ -14,6 +14,7 @@
 void init(Context* context) {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     context->window = glfwCreateWindow(context->width, context->height, "Suzanne", NULL, NULL);
 
     context->instance = createInstance();
@@ -89,7 +90,7 @@ void mainLoop(Context* context) {
         gameLoop(context);
 
         uint32_t imageIndex;
-        ASSERT(vkAcquireNextImageKHR(context->device, context->swapchain, 0, context->acquireSemaphore, VK_NULL_HANDLE, &imageIndex));
+        ASSERT(vkAcquireNextImageKHR(context->device, context->swapchain, UINT64_MAX, context->acquireSemaphore, VK_NULL_HANDLE, &imageIndex));
 
         startRecording(context);
 
