@@ -6,9 +6,12 @@ layout(location=2) in vec3 lightVec;
 
 layout(binding=1) uniform sampler2D tex;
 
-layout(location=0) out vec4 outColor;
+layout(binding=2) readonly buffer Light {
+    vec3 lightPos;
+    vec3 lightColor;
+};
 
-vec3 lightColor = vec3(0.5);
+layout(location=0) out vec4 outColor;
 
 void main() {
     vec3 N = normalize(NORMAL);

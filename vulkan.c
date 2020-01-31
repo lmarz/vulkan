@@ -4,15 +4,17 @@
 
 Pipeline pipeline;
 Entity entity;
+Light light;
 
 void initFunc(Context* context) {
     pipeline = createPipeline(context, "res/shaders/vert.spv", "res/shaders/frag.spv");
-    entity = createEntity(context, "res/models/cube.gltf", "res/textures/white.png", pipeline);
+    entity = createEntity(context, "res/models/cube.gltf", "res/textures/cube.png", pipeline);
+    light = createLight(context, (vec3){-3.5, -3.5, -3.5}, (vec3){0.7, 0.7, 0.4});
 }
 
 void gameLoopFunc(Context* context) {
     entity = rotateEntity(entity, 0.05f, (vec3){0, 1, 0});
-    prepareEntity(context, entity, (vec3){-3.5, -3.5, -3.5});
+    prepareEntity(context, entity, light);
 }
 
 void renderLoopFunc(Context* context) {
@@ -20,6 +22,7 @@ void renderLoopFunc(Context* context) {
 }
 
 void cleanFunc(Context* context) {
+    destroyLight(context, light);
     destroyEntity(context, entity);
     destroyPipeline(context, pipeline);
 }

@@ -8,7 +8,11 @@ layout(binding=0) uniform UBO {
     mat4 projection;
     mat4 view;
     mat4 model;
+};
+
+layout(binding=2) readonly buffer Light {
     vec3 lightPos;
+    vec3 lightColor;
 };
 
 layout(location=0) out vec3 NORMAL;

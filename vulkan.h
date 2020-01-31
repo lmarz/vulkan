@@ -46,7 +46,6 @@ typedef struct Uniform {
     mat4 projection;
     mat4 view;
     mat4 model;
-    vec3 lightPos;
 } Uniform;
 
 typedef struct Texture {
@@ -76,6 +75,16 @@ typedef struct Entity {
     Pipeline pipeline;
     mat4 modelMatrix;
 } Entity;
+
+typedef struct LightObject {
+    vec3 lightPos;
+    vec3 lightColor;
+} LightObject;
+
+typedef struct Light {
+    Buffer buffer;
+    LightObject lightObject;
+} Light;
 
 typedef struct Context {
     int width;

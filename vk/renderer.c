@@ -46,7 +46,6 @@ void init(Context* context, void (*initFunc)(Context*)) {
     vec3 up = {0, 1, 0};
     glm_lookat(eye, center, up, context->uniform.view);
     glm_mat4_identity(context->uniform.model);
-    glm_vec3_one(context->uniform.lightPos);
 
     initFunc(context);
 }

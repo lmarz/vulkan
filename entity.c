@@ -4,7 +4,7 @@ Pipeline createPipeline(Context* context, const char* vertexShaderPath, const ch
     VkShaderModule vertexShader = loadShader(context, vertexShaderPath);
     VkShaderModule fragmentShader = loadShader(context, fragmentShaderPath);
 
-    VkDescriptorSetLayoutBinding bindings[2] = {};
+    VkDescriptorSetLayoutBinding bindings[3] = {};
     bindings[0].binding = 0;
     bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     bindings[0].descriptorCount = 1;
@@ -13,6 +13,10 @@ Pipeline createPipeline(Context* context, const char* vertexShaderPath, const ch
     bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     bindings[1].descriptorCount = 1;
     bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    bindings[2].binding = 2;
+    bindings[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[2].descriptorCount = 1;
+    bindings[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
     Pipeline pipeline;
     pipeline.setLayout = createSetLayout(context, ARRAYSIZE(bindings), bindings);
@@ -40,10 +44,18 @@ Entity createEntity(Context* context, const char* modelPath, const char* texture
     return entity;
 }
 
-void prepareEntity(Context* context, Entity entity, vec3 lightPos) {
+Light createLight(Context* context, vec3 lightPos, vec3 lightColor) {
+    Light light;
+    light.buffer = createBuffer(context, sizeof(LightObject), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    glm_vec3_copy(lightPos, light.lightObject.lightPos);
+    glm_vec3_copy(lightColor, light.lightObject.lightColor);
+    uploadBuffer(context, context->stagingBuffer, light.buffer, &light.lightObject, sizeof(LightObject));
+    return light;
+}
+
+void prepareEntity(Context* context, Entity entity, Light light) {
     Uniform uniform = context->uniform;
     glm_mat4_copy(entity.modelMatrix, uniform.model);
-    glm_vec3_copy(lightPos, uniform.lightPos);
 
     uploadBuffer(context, context->stagingBuffer, entity.model.uniformBuffer, &uniform, sizeof(Uniform));
 
@@ -57,7 +69,12 @@ void prepareEntity(Context* context, Entity entity, vec3 lightPos) {
     imageInfo.imageView = entity.texture.imageView;
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-    VkWriteDescriptorSet writes[2] = {};
+    VkDescriptorBufferInfo lightInfo = {};
+    lightInfo.buffer = light.buffer.buffer;
+    lightInfo.offset = 0;
+    lightInfo.range = sizeof(LightObject);
+
+    VkWriteDescriptorSet writes[3] = {};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = entity.pipeline.descriptorSet;
     writes[0].dstBinding = 0;
@@ -70,6 +87,12 @@ void prepareEntity(Context* context, Entity entity, vec3 lightPos) {
     writes[1].descriptorCount = 1;
     writes[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     writes[1].pImageInfo = &imageInfo;
+    writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[2].dstSet = entity.pipeline.descriptorSet;
+    writes[2].dstBinding = 2;
+    writes[2].descriptorCount = 1;
+    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    writes[2].pBufferInfo = &lightInfo;
 
     vkUpdateDescriptorSets(context->device, ARRAYSIZE(writes), writes, 0, NULL);
 }
@@ -87,6 +110,10 @@ void renderEntity(Context* context, Entity entity) {
 Entity rotateEntity(Entity entity, float angle, vec3 axis) {
     glm_rotate(entity.modelMatrix, angle, axis);
     return entity;
+}
+
+void destroyLight(Context* context, Light light) {
+    destroyBuffer(context, light.buffer);
 }
 
 void destroyEntity(Context* context, Entity entity) {
