@@ -7,12 +7,12 @@ Entity entity;
 
 void initFunc(Context* context) {
     pipeline = createPipeline(context, "res/shaders/vert.spv", "res/shaders/frag.spv");
-    entity = createEntity(context, "res/models/cube.gltf", "res/textures/cube.png", pipeline);
+    entity = createEntity(context, "res/models/cube.gltf", "res/textures/white.png", pipeline);
 }
 
 void gameLoopFunc(Context* context) {
     entity = rotateEntity(entity, 0.05f, (vec3){0, 1, 0});
-    prepareEntity(context, entity);
+    prepareEntity(context, entity, (vec3){-3.5, -3.5, -3.5});
 }
 
 void renderLoopFunc(Context* context) {

@@ -46,6 +46,7 @@ typedef struct Uniform {
     mat4 projection;
     mat4 view;
     mat4 model;
+    vec3 lightPos;
 } Uniform;
 
 typedef struct Texture {

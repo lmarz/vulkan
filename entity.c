@@ -40,9 +40,10 @@ Entity createEntity(Context* context, const char* modelPath, const char* texture
     return entity;
 }
 
-void prepareEntity(Context* context, Entity entity) {
+void prepareEntity(Context* context, Entity entity, vec3 lightPos) {
     Uniform uniform = context->uniform;
     glm_mat4_copy(entity.modelMatrix, uniform.model);
+    glm_vec3_copy(lightPos, uniform.lightPos);
 
     uploadBuffer(context, context->stagingBuffer, entity.model.uniformBuffer, &uniform, sizeof(Uniform));
 
