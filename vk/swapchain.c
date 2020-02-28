@@ -226,7 +226,6 @@ VkFramebuffer* createFramebuffers(Context* context) {
 
     for(int i = 0; i < context->swapchainImageCount; i++) {
         attachments[0] = context->swapchainImageViews[i];
-        // Maybe? createInfo.pAttachments = attachments;
         ASSERT(vkCreateFramebuffer(context->device, &createInfo, NULL, &framebuffers[i]));
     }
     return framebuffers;

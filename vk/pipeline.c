@@ -2,15 +2,15 @@
 
 VkShaderModule loadShader(Context* context, const char* path) {
     FILE* file = fopen(path, "rb");
-    if(!file) { printf("FnF\n"); exit(-1); }
+    if(!file) { fprintf(stderr, "FnF\n"); exit(-1); }
     fseek(file, 0, SEEK_END);
     long length = ftell(file);
-    if(length < 0) { printf("HELP\n"); exit(-1); }
+    if(length < 0) { fprintf(stderr, "HELP\n"); exit(-1); }
     fseek(file, 0, SEEK_SET);
 
     uint32_t* buffer = malloc(length);
     size_t size = fread(buffer, 1, length, file);
-    if(size != length) { printf("huh?\n"); exit(-1); }
+    if(size != length) { fprintf(stderr, "huh?\n"); exit(-1); }
     fclose(file);
 
     VkShaderModuleCreateInfo createInfo = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
@@ -87,6 +87,7 @@ VkPipeline createGraphicsPipeline(Context* context, VkShaderModule vertexShader,
     viewportState.viewportCount = 1;
 
     VkPipelineRasterizationStateCreateInfo rasterizationState = { VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO };
+    rasterizationState.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizationState.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizationState.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizationState.lineWidth = 1.0f;
@@ -98,7 +99,6 @@ VkPipeline createGraphicsPipeline(Context* context, VkShaderModule vertexShader,
     depthStencilState.depthTestEnable = VK_TRUE;
     depthStencilState.depthWriteEnable = VK_TRUE;
     depthStencilState.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
-    depthStencilState.front = depthStencilState.back;
     depthStencilState.back.compareOp = VK_COMPARE_OP_ALWAYS;
 
     VkPipelineColorBlendAttachmentState colorAttachmentState = {};

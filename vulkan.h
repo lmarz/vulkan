@@ -9,10 +9,6 @@
 
 #include <cglm/cglm.h>
 
-#include <cgltf.h>
-
-#include <stb_image.h>
-
 #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
 #define ASSERT(val) if(val != VK_SUCCESS) { fprintf(stderr, "Error: %d in line %d of %s\n", val, __LINE__, __FILE__); exit(-1); }
 

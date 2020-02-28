@@ -3,6 +3,10 @@
 void init(Context* context, void (*initFunc)(Context*)) {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+    context->width = 800;
+    context->height = 600;
+
     context->window = glfwCreateWindow(context->width, context->height, "Suzanne", NULL, NULL);
 
     context->instance = createInstance();
@@ -82,7 +86,7 @@ void mainLoop(Context* context, void (*gameLoopFunc)(Context*), void (*renderLoo
 
         startRecording(context);
 
-        VkClearColorValue colorValue = {0.0f, 0.0f, 0.2f, 1.0f};
+        VkClearColorValue colorValue = {0.0f, 0.0f, 0.0f, 1.0f};
         VkClearDepthStencilValue depthValue = {1.0f, 0.0f};
 
         VkClearValue clearValues[2];

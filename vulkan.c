@@ -8,12 +8,12 @@ Light light;
 
 void initFunc(Context* context) {
     pipeline = createPipeline(context, "res/shaders/vert.spv", "res/shaders/frag.spv");
-    entity = createEntity(context, "res/models/cube.gltf", "res/textures/cube.png", pipeline);
-    light = createLight(context, (vec3){-3.5, -3.5, -3.5}, (vec3){0.7, 0.7, 0.4});
+    entity = createEntity(context, "res/models/suzanne.gltf", "res/textures/white.png", pipeline);
+    light = createLight(context, (vec3){3.5, -3.5, 3.5}, (vec3){0.7, 0.7, 0.4});
 }
 
 void gameLoopFunc(Context* context) {
-    entity = rotateEntity(entity, 0.05f, (vec3){0, 1, 0});
+    entity = rotateEntity(entity, 0.01f, (vec3){0, 1, 0});
     prepareEntity(context, entity, light);
 }
 
@@ -29,8 +29,6 @@ void cleanFunc(Context* context) {
 
 int main(int argc, char const *argv[]) {
     Context* context = malloc(sizeof(Context));
-    context->width = 800;
-    context->height = 600;
 
     init(context, initFunc);
     mainLoop(context, gameLoopFunc, renderLoopFunc);

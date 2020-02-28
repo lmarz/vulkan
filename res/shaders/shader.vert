@@ -20,9 +20,9 @@ layout(location=1) out vec2 UV;
 layout(location=2) out vec3 lightVec;
 
 void main() {
-    NORMAL = mat3(transpose(inverse(model))) * normal;
+    NORMAL = mat3(transpose(inverse(view * model))) * normal;
     UV = uv;
-    lightVec = lightPos - vec3(model * vec4(pos, 1.0));
+    lightVec = lightPos - vec3(view * model * vec4(pos, 1.0));
 
     gl_Position = projection * view * model * vec4(pos, 1.0f);
 }
